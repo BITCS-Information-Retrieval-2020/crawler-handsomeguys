@@ -47,8 +47,7 @@ def parser(data):
     for info in data:
         author = {
             'name': info['author']['name'],
-            'email': info['author']['email'],
-            'photo_url': info['author']['photoURL']
+            'email': info['author']['email']
         }
         title = info['title']
         description = info['description']
