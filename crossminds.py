@@ -1,6 +1,7 @@
 import json
 
 import requests
+from utils import download_video
 
 BASE_URL = 'https://crossminds.ai'
 
@@ -51,9 +52,10 @@ def parser(data):
         }
         title = info['title']
         description = info['description']
+        video_source = info['source']
         video_url = info['video_url']
-
-        yield author, title, description, video_url
+        print(info)
+        yield author, title, description, video_source, video_url
 
 
 if __name__ == '__main__':
@@ -62,10 +64,11 @@ if __name__ == '__main__':
         limit, offset = 24, 0
         while True:
             papers = get_conference_papers(conference, limit=limit, offset=offset)
-            for author, title, description, video_url in parser(papers['results']):
+            for author, title, description, video_source, video_url in parser(papers['results']):
                 print(author, description, video_url)
+                download_video(video_source, video_url, title)
 
-            if next_request == papers['next_request']:
+            if next_request := papers['next_request']:
                 limit, offset = next_request['limit'], next_request['offset']
             else:
                 break
