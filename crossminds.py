@@ -65,7 +65,7 @@ if __name__ == '__main__':
             for author, title, description, video_url in parser(papers['results']):
                 print(author, description, video_url)
 
-            if next_request == papers['next_request']:
+            if next_request := papers['next_request']:
                 limit, offset = next_request['limit'], next_request['offset']
             else:
                 break

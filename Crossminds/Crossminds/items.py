@@ -11,25 +11,28 @@ import pymongo
 from pymongo.errors import DuplicateKeyError
 from .settings import LOCAL_MONGO_PORT,LOCAL_MONGO_HOST,DB_NAME
 
-class MongoDB():
-    def __init__(self):
-        client = pymongo.MongoClient(LOCAL_MONGO_HOST, LOCAL_MONGO_PORT)
-        db = client[DB_NAME]
-        self.page = db['crossminds']
+# class MongoDB():
+#     def __init__(self):
+#         client = pymongo.MongoClient(LOCAL_MONGO_HOST, LOCAL_MONGO_PORT)
+#         db = client[DB_NAME]
+#         self.page = db['crossminds']
 
-    @staticmethod
-    def insert_item(collection, item):
-        try:
-            collection.update(dict(item),dict(item),upsert=True)
-        except DuplicateKeyError:
-            print("重复数据")
-            """
-            说明有重复数据
-            """
+#     @staticmethod
+#     def insert_item(collection, item):
+#         try:
+#             collection.update(dict(item),dict(item),upsert=True)
+#         except DuplicateKeyError:
+#             print("重复数据")
+#             """
+#             说明有重复数据
+#             """
 
 
 
 class CrossmindsItem(scrapy.Item):
+    author_id = scrapy.Field()
+    author_photo = scrapy.Field()
+    author = scrapy.Field()
     author_name = scrapy.Field()
     author_email = scrapy.Field()
     title = scrapy.Field()

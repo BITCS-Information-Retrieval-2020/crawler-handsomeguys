@@ -8,9 +8,11 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-LOCAL_MONGO_HOST = '101.124.42.4'
+LOCAL_MONGO_HOST = '47.103.222.126'
 LOCAL_MONGO_PORT = 27017
-DB_NAME = 'Crossminds'
+USER_NAME = 'handsomeguys'
+PASSWORD = '12138'
+DB_NAME = 'crawler'
 
 BOT_NAME = 'Crossminds'
 
@@ -38,8 +40,12 @@ CONCURRENT_REQUESTS = 15
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 DEFAULT_REQUEST_HEADERS = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'
+    'accept': 'application/json, text/plain, */*',
+    'content-type': 'application/json',
+    'Connection': 'keep-alive',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'referer': 'https://crossminds.ai/',
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'
 }
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
