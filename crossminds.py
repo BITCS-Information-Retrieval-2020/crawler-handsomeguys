@@ -54,7 +54,7 @@ def parser(data):
         description = info['description']
         video_source = info['source']
         video_url = info['video_url']
-        print(info)
+
         yield author, title, description, video_source, video_url
 
 
