@@ -6,11 +6,10 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 import pymongo
-import time
-
 from pymongo.errors import DuplicateKeyError
-from Crossminds.settings import LOCAL_MONGO_HOST,LOCAL_MONGO_PORT,DB_NAME
+
 from Crossminds.items import CrossmindsItem
+
 
 class CrossmindsPipeline(object):
     def __init__(self):
@@ -18,12 +17,13 @@ class CrossmindsPipeline(object):
         client = pymongo.MongoClient('mongodb://47.103.222.126:27017')
         # 'mongo --host 47.103.222.126 -u handsomeguys -p 12138 --authenticationDatabase crawler'
         db = client.crawler
-        db.authenticate('handsomeguys','12138')
+        db.authenticate('handsomeguys', '12138')
         # db = client[DB_NAME]
-        self.PaperSpiderItem =db['test']
+        self.PaperSpiderItem = db['test']
+
     def process_item(self, item, spider):
         """ 判断item的类型，并作相应的处理，再入数据库 """
-        if isinstance(item,CrossmindsItem):
+        if isinstance(item, CrossmindsItem):
             self.insert_item(self.PaperSpiderItem, item)
         return item
 
@@ -31,8 +31,8 @@ class CrossmindsPipeline(object):
     def insert_item(collection, item):
         try:
             collection.insert(dict(item))
-        except DuplicateKeyError:
+        except DuplicateKeyError as e:
             """
             说明有重复数据
             """
-            pass
+            print(e)
