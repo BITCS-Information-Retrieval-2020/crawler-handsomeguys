@@ -19,6 +19,12 @@ BOT_NAME = 'Crossminds'
 SPIDER_MODULES = ['Crossminds.spiders']
 NEWSPIDER_MODULE = 'Crossminds.spiders'
 
+FILES_STORE = '../data/PDFs'
+FILES_URLS_FIELD = 'file_urls'  # 这里对应着item.py文件中的字段
+FILES_RESULT_FIELD = 'files'  # 同样对应item.py文件中的字段
+# 120 days of delay for files expiration
+FILES_EXPIRES = 120
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'Crossminds (+http://www.yourdomain.com)'
 
@@ -80,6 +86,7 @@ EXTENSIONS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'Crossminds.pipelines.CrossmindsPipeline': 300,
+    'Crossminds.pipelines.PDFPipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
