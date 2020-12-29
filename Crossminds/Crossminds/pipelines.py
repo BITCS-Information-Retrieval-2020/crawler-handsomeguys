@@ -29,10 +29,16 @@ class CrossmindsPipeline(object):
 
     @staticmethod
     def insert_item(collection, item):
-        try:
-            collection.insert(dict(item))
-        except DuplicateKeyError as e:
-            """
-            说明有重复数据
-            """
-            print(e)
+        insert_data = dict(item)
+
+        query = list(collection.find({}, {"_id": 1}).sort('_id', -1).limit(1))
+        insert_data['_id'] = 1 if len(query) == 0 else query[0]['_id'] + 1
+
+        collection.insert(insert_data)
+        # try:
+        #     collection.insert(dict(item))
+        # except DuplicateKeyError as e:
+        #     """
+        #     说明有重复数据
+        #     """
+        #     print(e)
