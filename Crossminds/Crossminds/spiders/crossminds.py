@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
-import random
-import time
+import os
 
 import scrapy
+from Crossminds.items import CrossmindsItem
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Request
 from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
-
-from Crossminds.items import CrossmindsItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 
 
 def get_conferences(data):
@@ -54,19 +52,24 @@ class CrossmindsSpider(scrapy.Spider):
         conferences = get_conferences(response.text)
         # 获取每一个会议
         for conference in tqdm(conferences):
-            time.sleep(random.uniform(1, 5))
+            # time.sleep(random.uniform(1, 5))
             body = json.dumps({'limit': 5000, 'offset': 0, 'search': {'category': conference}})
-            yield Request(url=self.second_url, method='post', headers=DEFAULT_REQUEST_HEADERS, body=body, callback=self.parse_detail)
+            yield Request(url=self.second_url, method='post', headers=DEFAULT_REQUEST_HEADERS, body=body,
+                          callback=lambda res, con=conference: self.parse_detail(res, con))
 
-    def parse_detail(self, response):
+    def parse_detail(self, response, conference):
         info = CrossmindsItem()
+        org, year = conference.split(' ')
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
-            info['_id'] = _id
+            info['id'] = _id
             info['title'] = title
             info['authors'] = author['name']
+            info['publicationOrg'] = org
+            info['year'] = year
             info['description'] = description
             info['videoUrl'] = video_url
+            info['source'] = video_source
             yield info
 
 
