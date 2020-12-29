@@ -2,3 +2,5 @@
 .idea/
 data/PDFs/
 data/videos/
+__pycache__
+*zhoutest*
