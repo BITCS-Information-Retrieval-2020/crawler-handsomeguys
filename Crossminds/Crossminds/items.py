@@ -26,7 +26,7 @@ import scrapy
 
 
 class CrossmindsItem(scrapy.Item):
-    _id = scrapy.Field()
+    id = scrapy.Field()
     title = scrapy.Field()
     authors = scrapy.Field()
     abstract = scrapy.Field()
@@ -39,4 +39,5 @@ class CrossmindsItem(scrapy.Item):
     videoUrl = scrapy.Field()
     videoPath = scrapy.Field()
     description = scrapy.Field()
+    source = scrapy.Field()
     pass
