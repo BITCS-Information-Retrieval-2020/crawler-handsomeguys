@@ -1,6 +1,8 @@
 import json
 
 import requests
+import time
+import random
 from utils import download_video
 
 BASE_URL = 'https://crossminds.ai'
@@ -46,6 +48,7 @@ def get_conference_papers(conference, limit, offset):
 
 def parser(data):
     for info in data:
+        _id = info['_id']
         author = {
             'name': info['author']['name'],
             'email': info['author']['email']
@@ -55,20 +58,19 @@ def parser(data):
         video_source = info['source']
         video_url = info['video_url']
 
-        yield author, title, description, video_source, video_url
+        yield _id, author, title, description, video_source, video_url
 
 
 if __name__ == '__main__':
     conferences = get_conferences()
     for conference in conferences:
-        limit, offset = 24, 0
-        while True:
-            papers = get_conference_papers(conference, limit=limit, offset=offset)
-            for author, title, description, video_source, video_url in parser(papers['results']):
-                print(author, description, video_url)
-                download_video(video_source, video_url, title)
-
-            if next_request := papers['next_request']:
-                limit, offset = next_request['limit'], next_request['offset']
-            else:
-                break
+        limit, offset = 2000, 0
+        papers = get_conference_papers(conference, limit=limit, offset=offset)
+        for _id, author, title, description, video_source, video_url in parser(papers['results']):
+            print(_id, author, description, video_url)
+            # download_video(video_source, video_url, title)
+        time.sleep(random.uniform(1, 5))
+        # if next_request := papers['next_request']:
+        #     limit, offset = next_request['limit'], next_request['offset']
+        # else:
+        #     break

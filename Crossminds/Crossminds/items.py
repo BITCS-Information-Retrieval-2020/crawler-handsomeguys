@@ -6,10 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-import pymongo
 
-from pymongo.errors import DuplicateKeyError
-from .settings import LOCAL_MONGO_PORT,LOCAL_MONGO_HOST,DB_NAME
 
 # class MongoDB():
 #     def __init__(self):
@@ -28,14 +25,19 @@ from .settings import LOCAL_MONGO_PORT,LOCAL_MONGO_HOST,DB_NAME
 #             """
 
 
-
 class CrossmindsItem(scrapy.Item):
-    author_id = scrapy.Field()
-    author_photo = scrapy.Field()
-    author = scrapy.Field()
-    author_name = scrapy.Field()
-    author_email = scrapy.Field()
+    id = scrapy.Field()
     title = scrapy.Field()
+    authors = scrapy.Field()
+    abstract = scrapy.Field()
+    publicationOrg = scrapy.Field()
+    year = scrapy.Field()
+    pdfUrl = scrapy.Field()
+    pdfPath = scrapy.Field()
+    publicationUrl = scrapy.Field()
+    codeUrl = scrapy.Field()
+    videoUrl = scrapy.Field()
+    videoPath = scrapy.Field()
     description = scrapy.Field()
-    video_url = scrapy.Field()
+    source = scrapy.Field()
     pass
