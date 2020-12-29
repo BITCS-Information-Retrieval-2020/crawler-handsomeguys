@@ -3,12 +3,13 @@ import json
 import os
 
 import scrapy
-from Crossminds.items import CrossmindsItem
+from Crossminds.items import CrossmindsItem, PDFItem
 from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Request
 from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
+import re
 
 
 def get_conferences(data):
@@ -59,6 +60,7 @@ class CrossmindsSpider(scrapy.Spider):
 
     def parse_detail(self, response, conference):
         info = CrossmindsItem()
+        pdfs = PDFItem()
         org, year = conference.split(' ')
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
@@ -71,6 +73,26 @@ class CrossmindsSpider(scrapy.Spider):
             info['videoUrl'] = video_url
             info['source'] = video_source
             yield info
+
+            url_list = []
+            pattern = r'(http|https)://[\w\./-]+'
+            url = re.search(pattern, description)
+            while url:
+                url_list.append(url.group())
+                start, end = url.span()
+                description = description[:start] + description[end + 1:]
+                url = re.search(pattern, description)
+
+            pdfs['file_names'] = title
+            for url in url_list:
+                if 'arxiv.org/abs' in url:
+                    url = url.replace('abs', 'pdf')
+                    url += '.pdf'
+                    pdfs['file_urls'] = url
+                    yield pdfs
+                elif '.pdf' in url:
+                    pdfs['file_urls'] = url
+                    yield pdfs
 
 
 if __name__ == "__main__":
