@@ -17,7 +17,6 @@ class HandsomeMongo(object):
         self.NOTFOUND=404
         # self.delete_one=self.target_coll.delete_one
         # self.delete_many=self.target_coll.delete_many
-        self.update=self.target_coll.update
         self.find=self.target_coll.find
         self.find_one=self.target_coll.find_one
 
@@ -75,6 +74,20 @@ class HandsomeMongo(object):
             return self.SUCESSFUL
         else:
             return self.NOTFOUND
+
+    # def update_one(self, filter, update) -> int:
+    #     doc_upd=self.target_coll.find_one(filter)
+    #     if doc_upd is not None:
+    #         danger=False
+    #         for new_value in update.values():
+    #             for attr in new_value.keys():
+    #                 if attr in ["title", "authors"]:
+    #                     danger=True
+    #                     break
+    #         if danger:
+    #             doc4checksum=self.construct_checksumdoc(doc_upd)
+                
+    #         else:
 
     # def delete_many(self, query):
     #     return self.target_coll.delete_many(query)
