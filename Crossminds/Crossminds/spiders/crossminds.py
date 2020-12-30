@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import re
+import os
 
 import scrapy
 from scrapy.crawler import CrawlerProcess
@@ -9,7 +10,7 @@ from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
 
 from Crossminds.items import CrossmindsItem, PDFItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
 
 
 def get_conferences(data):
@@ -64,16 +65,6 @@ class CrossmindsSpider(scrapy.Spider):
         org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
-            info['id'] = _id
-            info['title'] = title
-            info['authors'] = author['name']
-            info['publicationOrg'] = org
-            info['year'] = year
-            info['description'] = description
-            info['videoUrl'] = video_url
-            info['source'] = video_source
-            yield info
-
             url_list = []
             pattern = r'(http|https)://[\w\./-]+'
             url = re.search(pattern, description)
@@ -89,10 +80,26 @@ class CrossmindsSpider(scrapy.Spider):
                     url = url.replace('abs', 'pdf')
                     url += '.pdf'
                     pdfs['file_urls'] = url
+                    info['pdfUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
                     yield pdfs
                 elif '.pdf' in url:
                     pdfs['file_urls'] = url
+                    info['pdfUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
                     yield pdfs
+                elif 'github.com' in url and '.pdf' not in url:
+                    info['codeUrl'] = url
+
+            info['id'] = _id
+            info['title'] = title
+            info['authors'] = author['name']
+            info['publicationOrg'] = org
+            info['year'] = year
+            info['description'] = description
+            info['videoUrl'] = video_url
+            info['source'] = video_source
+            yield info
 
 
 if __name__ == "__main__":
