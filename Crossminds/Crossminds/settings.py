@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 # Scrapy settings for Crossminds project
 #
 # For simplicity, this file contains only settings considered important or
@@ -19,7 +19,7 @@ BOT_NAME = 'Crossminds'
 SPIDER_MODULES = ['Crossminds.spiders']
 NEWSPIDER_MODULE = 'Crossminds.spiders'
 
-FILES_STORE = '../data/PDFs'
+FILES_STORE = os.path.join('..', 'data', 'PDFs')
 FILES_URLS_FIELD = 'file_urls'  # 这里对应着item.py文件中的字段
 FILES_RESULT_FIELD = 'files'  # 同样对应item.py文件中的字段
 # 120 days of delay for files expiration
@@ -38,6 +38,7 @@ CONCURRENT_REQUESTS = 32
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 DOWNLOAD_DELAY = 3
+DOWNLOAD_TIMEOUT = 5000
 # The download delay setting will honor only one of:
 CONCURRENT_REQUESTS_PER_DOMAIN = 15
 CONCURRENT_REQUESTS_PER_IP = 15
