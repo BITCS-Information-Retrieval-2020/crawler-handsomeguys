@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import json
-import os
+import re
 
 import scrapy
-from Crossminds.items import CrossmindsItem, PDFItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Request
 from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
-import re
+
+from Crossminds.items import CrossmindsItem, PDFItem
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 
 
 def get_conferences(data):
@@ -61,7 +61,7 @@ class CrossmindsSpider(scrapy.Spider):
     def parse_detail(self, response, conference):
         info = CrossmindsItem()
         pdfs = PDFItem()
-        org, year = conference.split(' ')
+        org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
             info['id'] = _id
