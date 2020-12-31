@@ -88,7 +88,7 @@ class CrossmindsSpider(scrapy.Spider):
                 if 'arxiv.org/abs' in url:
                     url = url.replace('abs', 'pdf')
                     url += '.pdf'
-                    pdfs['file_urls'] = url
+                    pdfs['file_urls'] = re.sub(r'\.+', '.', url)
                     yield pdfs
                 elif '.pdf' in url:
                     pdfs['file_urls'] = url
