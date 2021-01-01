@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import re
+import os
 
 import scrapy
 from scrapy.crawler import CrawlerProcess
@@ -9,7 +10,7 @@ from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
 
 from Crossminds.items import CrossmindsItem, PDFItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
 
 
 def get_conferences(data):
@@ -59,11 +60,33 @@ class CrossmindsSpider(scrapy.Spider):
                           callback=lambda res, con=conference: self.parse_detail(res, con))
 
     def parse_detail(self, response, conference):
-        info = CrossmindsItem()
-        pdfs = PDFItem()
         org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
+            info = CrossmindsItem()
+            pdfs = PDFItem()
+
+            pdfs['file_names'] = title
+
+            urls = re.findall(r'https?://[^\s)]*', description)
+            for url in urls:
+                if 'arxiv.org/abs' in url:
+                    url = url.replace('abs', 'pdf') + '.pdf'
+                    url = re.sub(r'[^\x21-\x7e]', '', url)
+                    url = re.sub(r'\.{2,}', '.', url)
+                    info['pdfUrl'] = url
+                    info['publicationUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
+                    break
+                elif '.pdf' in url:
+                    info['pdfUrl'] = url
+                    info['publicationUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
+                    break
+                elif 'github.com' in url:
+                    info['codeUrl'] = url
+                    break
+
             info['id'] = _id
             info['title'] = title
             info['authors'] = author['name']
@@ -73,26 +96,6 @@ class CrossmindsSpider(scrapy.Spider):
             info['videoUrl'] = video_url
             info['source'] = video_source
             yield info
-
-            url_list = []
-            pattern = r'(http|https)://[\w\./-]+'
-            url = re.search(pattern, description)
-            while url:
-                url_list.append(url.group())
-                start, end = url.span()
-                description = description[:start] + description[end + 1:]
-                url = re.search(pattern, description)
-
-            pdfs['file_names'] = title
-            for url in url_list:
-                if 'arxiv.org/abs' in url:
-                    url = url.replace('abs', 'pdf')
-                    url += '.pdf'
-                    pdfs['file_urls'] = re.sub(r'\.+', '.', url)
-                    yield pdfs
-                elif '.pdf' in url:
-                    pdfs['file_urls'] = url
-                    yield pdfs
 
 
 if __name__ == "__main__":
