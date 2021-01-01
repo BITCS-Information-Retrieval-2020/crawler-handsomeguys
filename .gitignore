@@ -2,3 +2,7 @@
 .idea/
 data/PDFs/
 data/videos/
+__pycache__
+*zhoutest*
+Crossminds/Crossminds/data/
+test.py

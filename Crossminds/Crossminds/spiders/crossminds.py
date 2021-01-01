@@ -60,36 +60,32 @@ class CrossmindsSpider(scrapy.Spider):
                           callback=lambda res, con=conference: self.parse_detail(res, con))
 
     def parse_detail(self, response, conference):
-        info = CrossmindsItem()
-        pdfs = PDFItem()
         org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
-            url_list = []
-            pattern = r'(http|https)://[\w\./-]+'
-            url = re.search(pattern, description)
-            while url:
-                url_list.append(url.group())
-                start, end = url.span()
-                description = description[:start] + description[end + 1:]
-                url = re.search(pattern, description)
+            info = CrossmindsItem()
+            pdfs = PDFItem()
 
             pdfs['file_names'] = title
-            for url in url_list:
+
+            urls = re.findall(r'https?://[^\s)]*', description)
+            for url in urls:
                 if 'arxiv.org/abs' in url:
-                    url = url.replace('abs', 'pdf')
-                    url += '.pdf'
-                    pdfs['file_urls'] = url
+                    url = url.replace('abs', 'pdf') + '.pdf'
+                    url = re.sub(r'[^\x21-\x7e]', '', url)
+                    url = re.sub(r'\.{2,}', '.', url)
                     info['pdfUrl'] = url
+                    info['publicationUrl'] = url
                     info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    yield pdfs
+                    break
                 elif '.pdf' in url:
-                    pdfs['file_urls'] = url
                     info['pdfUrl'] = url
+                    info['publicationUrl'] = url
                     info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    yield pdfs
-                elif 'github.com' in url and '.pdf' not in url:
+                    break
+                elif 'github.com' in url:
                     info['codeUrl'] = url
+                    break
 
             info['id'] = _id
             info['title'] = title
