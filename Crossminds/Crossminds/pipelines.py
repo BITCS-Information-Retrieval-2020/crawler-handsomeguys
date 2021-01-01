@@ -56,13 +56,16 @@ class PDFPipeline(FilesPipeline):
 
     def file_path(self, request, response=None, info=None, *, item=None):
         file_name = request.meta['file_names']
+        file_name = re.sub(r'Session\s*\w+\s*-\s*', '', file_name)
+        file_name = re.sub(r'SIGIR\s*\w*\s*-\s*', '', file_name)
         file_name = re.sub(r'\[[\x00-\x7F]+]\s*', '', file_name)  # 去掉中括号
         file_name = re.sub(r'(\([\x00-\x7F]*\))', '', file_name)  # 去掉小括号
         file_name = file_name.strip()
         file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
-        file_name = re.sub(r'\W', '', file_name)  # 去掉所有奇怪的字符
+        file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
         return file_name + '.pdf'
 
     def item_completed(self, results, item, info):
-        print(results, item['file_urls'])
+        if isinstance(item, PDFItem):
+            print(results, item['file_urls'])
         return item
