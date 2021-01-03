@@ -41,6 +41,21 @@ def parse_paper(data):
         yield _id, author, title, description, video_source, video_url
 
 
+def format_title(title):
+    title = re.sub(r'Session\s*\w+\s*-\s*', '', title)
+    title = re.sub(r'SIGIR\s*\w*\s*-\s*', '', title)
+    title = re.sub(r'\[[\x00-\x7F]+]\s*', '', title)  # 去掉中括号
+    title = re.sub(r'(\([\x00-\x7F]*\))', '', title)  # 去掉小括号
+    title = title.strip()
+    return title
+
+
+def format_file_name(file_name):
+    file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
+    file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
+    return file_name
+
+
 class CrossmindsSpider(scrapy.Spider):
     name = 'Crossminds'
     start_url = 'https://api.crossminds.io/content/category/parents/details'
@@ -66,7 +81,9 @@ class CrossmindsSpider(scrapy.Spider):
             info = CrossmindsItem()
             pdfs = PDFItem()
 
-            pdfs['file_names'] = title
+            title = format_title(title)
+            file_name = format_file_name(title) + '.pdf'
+            pdfs['file_names'] = file_name
 
             urls = re.findall(r'https?://[^\s)]*', description)
             for url in urls:
@@ -76,16 +93,13 @@ class CrossmindsSpider(scrapy.Spider):
                     url = re.sub(r'\.{2,}', '.', url)
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    break
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif '.pdf' in url:
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    break
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif 'github.com' in url:
                     info['codeUrl'] = url
-                    break
 
             info['id'] = _id
             info['title'] = title
