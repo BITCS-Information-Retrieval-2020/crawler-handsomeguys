@@ -76,16 +76,13 @@ class CrossmindsSpider(scrapy.Spider):
                     url = re.sub(r'\.{2,}', '.', url)
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    break
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif '.pdf' in url:
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{title}.pdf')
-                    break
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif 'github.com' in url:
                     info['codeUrl'] = url
-                    break
 
             info['id'] = _id
             info['title'] = title
