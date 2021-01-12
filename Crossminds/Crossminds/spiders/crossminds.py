@@ -86,7 +86,7 @@ class CrossmindsSpider(scrapy.Spider):
             pdfs = PDFItem()
 
             title = format_title(title)
-            file_name = format_file_name(title) + '.pdf'
+            file_name = format_file_name(title)
             pdfs['file_names'] = file_name
 
             urls = re.findall(r'https?://[^\s)]*', description)
