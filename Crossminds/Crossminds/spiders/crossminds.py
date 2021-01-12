@@ -51,8 +51,12 @@ def format_title(title):
 
 
 def format_file_name(file_name):
-    file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
-    file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
+    # file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
+    # file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
+    file_name = re.sub(r'[^A-Za-z0-9_]', ' ', file_name)
+    file_name = file_name.strip()
+    file_name = re.sub(r'\s+', '_', file_name)
+
     return file_name
 
 
@@ -91,15 +95,20 @@ class CrossmindsSpider(scrapy.Spider):
                     url = url.replace('abs', 'pdf') + '.pdf'
                     url = re.sub(r'[^\x21-\x7e]', '', url)
                     url = re.sub(r'\.{2,}', '.', url)
+                    pdfs['file_urls'] = url
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
                     info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif '.pdf' in url:
+                    pdfs['file_urls'] = url
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
                     info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
                 elif 'github.com' in url:
                     info['codeUrl'] = url
+
+            if pdfs['file_urls']:
+                yield pdfs
 
             info['id'] = _id
             info['title'] = title
