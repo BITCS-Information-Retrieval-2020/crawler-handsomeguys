@@ -6,3 +6,5 @@ __pycache__
 *zhoutest*
 Crossminds/Crossminds/data/
 test.py
+*.cfg
+*.log
