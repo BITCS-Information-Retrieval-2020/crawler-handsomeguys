@@ -47,7 +47,7 @@ class PaperWithCodeSpider(scrapy.Spider):
                 "abstract":
                 paper["abstract"],
                 "publicationOrg":
-                paper["conference"] if paper["conference"] is not None else "",
+                paper["proceeding"] if paper["proceeding"] is not None else "",
                 "year":
                 paper["published"].split('-')[0]
                 if paper["published"] is not None else "",

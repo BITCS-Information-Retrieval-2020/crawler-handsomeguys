@@ -97,7 +97,33 @@ scrapy crawl Crossminds
 
 ### Paper with code
 
-待填写
+Paper with code 爬虫基于 scrapy 框架进行开发，能够高效率的爬取 paperswithcode网站上的论文资料，包含论文的标题、论文作者、论文摘要、论文年份、论文发表的会议（如果有的话）以及论文的代码（如果有的话）等信息，并具有下载 PDF 文件的功能。
+
+#### 工作流程
+
+爬虫的工作模式如下：
+
+1. 从paperswithcode开放api`https://paperswithcode.com/api/v1/papers/`中获取到 paperswithcode中可浏览的所有论文列表（默认以50个论文为1页）
+2. 对第 1 步中获取到的每一个论文列表页，获取每个论文的id信息，根据论文的id信息，向`papers/{paper_id}`发送 GET 请求，该 API 会返回一个 json 字符串，其中包含了该论文所有的信息，包括论文的标题、论文作者、论文摘要、论文年份、论文发表的会议（如果有的话），以及论文PDF文件的URL等
+3. 同时，根据论文的id信息，向`papers/{paper_id}/repositories`发送 GET 请求，该 API 会返回一个 json 字符串，其中包含了该论文的代码信息，包括代码的url、代码描述、用到的框架等。
+4. 根据3、4步收集到的信息，将论文信息构建成json格式写入到MongoDB数据库中，并通过Scrapy封装的Item类和Pipline将论文PDF文件下载到本地
+5. 为了能够实现增量爬虫，我们为采用配置文件保存的方式将已经爬取到的论文页的page进行保存，由于新增的论文会在新的论文页中保存，因此每次运行都会从保存的page开始爬取
+
+papers with code爬虫的运行受 `main.py` 控制，也可使用如下代码单独运行 paperswithcode爬虫而不进行视频下载：
+
+```bash
+cd Paperwithcode
+scrapy crawl paperswithcode
+```
+
+#### 接口设计
+
+除了设计爬虫之外，本模块还提供了实用论文title在网页中进行检索的功能，便于在用户在数据库检索不到论文时即使在网站中进行检索。
+
+#### 小组分工
+
+- 杨毅哲：paperswithcode的api实验，爬虫模块的设计与实现
+- 刘啸尘：主动检索接口的设计与实现
 
 ### DBLP
 
