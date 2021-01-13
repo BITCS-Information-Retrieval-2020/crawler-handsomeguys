@@ -8,3 +8,4 @@ Crossminds/Crossminds/data/
 test.py
 *.cfg
 *.log
+*.pdf

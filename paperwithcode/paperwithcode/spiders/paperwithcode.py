@@ -6,6 +6,9 @@ import pymongo
 import json
 from paperwithcode.settings import FILE_STORED_PATH
 import os
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError
+from twisted.internet.error import TimeoutError
 
 
 class PaperWithCodeSpider(scrapy.Spider):
@@ -70,6 +73,7 @@ class PaperWithCodeSpider(scrapy.Spider):
                 meta['_id'] = 1 if len(query) == 0 else query[0]['_id'] + 1
                 self.collection.insert_one(meta)
                 if repository is not None:
+                    print(paper.title)
                     yield Request(
                         url=paper.url_pdf,
                         meta={
@@ -88,7 +92,27 @@ class PaperWithCodeSpider(scrapy.Spider):
         return item
 
     def errback(self, failure):
+        # log all errback failures,
+        # in case you want to do something special for some errors,
+        # you may need the failure's type
         self.logger.error(repr(failure))
+
+        if failure.check(HttpError):
+            # you can get the response
+            response = failure.value.response
+            self.logger.error('HttpError on %s', response.url)
+            print('HttpError on %s', response.url)
+
+        elif failure.check(DNSLookupError):
+            # this is the original request
+            request = failure.request
+            self.logger.error('DNSLookupError on %s', request.url)
+            print('DNSLookupError on %s', request.url)
+
+        elif failure.check(TimeoutError):
+            request = failure.request
+            self.logger.error('TimeoutError on %s', request.url)
+            print('TimeoutError on %s', request.url)
 
     @staticmethod
     def close(spider, reason):
