@@ -1,5 +1,4 @@
 import scrapy
-from paperswithcode import PapersWithCodeClient
 from paperwithcode.items import PaperwithcodeItem
 from scrapy.http import Request
 import pymongo
@@ -9,6 +8,7 @@ import os
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError
+import requests
 
 
 class PaperWithCodeSpider(scrapy.Spider):
@@ -25,71 +25,58 @@ class PaperWithCodeSpider(scrapy.Spider):
         self.collection = db['paperswithcode']
 
     def start_requests(self):
-        client = PapersWithCodeClient()
         page = int(self.config['page'])
-        while page is not None:
-            try:
-                papers = client.paper_list(page=page)
-            except KeyError:
-                page += 1
-                papers = client.paper_list(page=page)
-            for paper in papers.results:
-                try:
-                    repository = client.paper_repository_list(
-                        paper_id=paper.id)[0]
-                except IndexError:
-                    repository = None
-                if paper.conference is not None:
-                    try:
-                        conference = client.conference_get(
-                            conference_id=paper.conference)
-                    except BaseException:
-                        conference = None
-                else:
-                    conference = None
-                meta = {
-                    "title":
-                    paper.title,
-                    "authors":
-                    ", ".join(paper.authors),
-                    "abstract":
-                    paper.abstract,
-                    "publicationOrg":
-                    conference.name if conference is not None else "",
-                    "year":
-                    paper.published.year,
-                    "pdfUrl":
-                    paper.url_pdf,
-                    "publicationUrl":
-                    paper.conference_url_pdf
-                    if paper.conference_url_pdf is not None else "",
-                    "codeUrl":
-                    repository.url if repository is not None else "",
-                }
-                query = list(
-                    self.collection.find({}, {
-                        "_id": 1
-                    }).sort('_id', -1).limit(1))
-                meta['_id'] = 1 if len(query) == 0 else query[0]['_id'] + 1
-                self.collection.insert_one(meta)
-                if repository is not None:
-                    print(paper.title)
-                    yield Request(
-                        url=paper.url_pdf,
-                        meta={
-                            "title": paper.title,
-                        },
-                        callback=self.parse,
-                        errback=self.errback,
-                    )
-            page = papers.next_page
-            self.config['page'] = page
+        start_url = f'https://paperswithcode.com/api/v1/papers/?format=json&page={page}'
+        yield Request(url=start_url, callback=self.parse, errback=self.errback)
 
     def parse(self, response):
-        item = PaperwithcodeItem()
-        item['title'] = response.meta['title']
-        item['pdfContent'] = response.body
-        return item
+        response_dict = json.loads(response.text)
+        next_url = response_dict["next"]
+        results = response_dict["results"]
+        for paper in results:
+            id = paper["id"]
+            code_url_response = requests.get(
+                f"https://paperswithcode.com/api/v1/papers/{id}/repositories")
+            code_urls = json.loads(code_url_response.text)
+            codeUrl = code_urls[0]["url"] if len(code_urls) > 0 else ""
+            data = {
+                "title":
+                paper["title"],
+                "authors":
+                ", ".join(paper["authors"]),
+                "abstract":
+                paper["abstract"],
+                "publicationOrg":
+                paper["conference"] if paper["conference"] is not None else "",
+                "year":
+                paper["published"].split('-')[0]
+                if paper["published"] is not None else "",
+                "pdfUrl":
+                paper["url_pdf"],
+                "publicationUrl":
+                paper["conference_url_pdf"]
+                if paper["conference_url_pdf"] is not None else "",
+                "codeUrl":
+                codeUrl
+            }
+            if codeUrl != "":
+                self.pdf_url.append(paper["url_pdf"])
+            query = list(
+                self.collection.find({}, {
+                    "_id": 1
+                }).sort('_id', -1).limit(1))
+            data['_id'] = 1 if len(query) == 0 else query[0]['_id'] + 1
+            self.collection.insert_one(data)
+            if codeUrl != "":
+                item = PaperwithcodeItem()
+                item['title'] = response.meta['title']
+                item['pdfContent'] = response.body
+                yield item
+        page = int(next_url.split("=")[-1])
+        if page > self.config["page"]:
+            # 当page大于上一个page值时表示爬虫未结束，更新config的page
+            self.config["page"] = page
+            yield Request(url=next_url, callback=self.parse)
 
     def errback(self, failure):
         # log all errback failures,
