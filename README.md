@@ -120,6 +120,17 @@ scrapy crawl paperswithcode
 
 除了设计爬虫之外，本模块还提供了实用论文title在网页中进行检索的功能，便于在用户在数据库检索不到论文时即使在网站中进行检索。
 
+工作模式：
+
+1. 利用paperswithcode的搜索框，对于用户输入的论文标题，首先转化为url编码，再进一步处理成论文搜索结果页面的url
+2. 对论文搜索结果的页面进行解析，获取所有相关论文主页的url，对每个url单独处理，获取每篇论文的主页内容
+3.对单篇论文主页的内容解析，根据是否包含出版方信息采取不同的解析策略，将论文信息保存为字典格式，多个相关的论文结果构成列表
+
+调用方法示例：
+
+title2content = Title2content()
+results = title2content.search(title)
+
 #### 小组分工
 
 - 杨毅哲：paperswithcode的api实验，爬虫模块的设计与实现
