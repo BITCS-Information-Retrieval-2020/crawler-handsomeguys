@@ -88,18 +88,15 @@ class PaperWithCodeSpider(scrapy.Spider):
             # you can get the response
             response = failure.value.response
             self.logger.error('HttpError on %s', response.url)
-            print('HttpError on %s', response.url)
 
         elif failure.check(DNSLookupError):
             # this is the original request
             request = failure.request
             self.logger.error('DNSLookupError on %s', request.url)
-            print('DNSLookupError on %s', request.url)
 
         elif failure.check(TimeoutError):
             request = failure.request
             self.logger.error('TimeoutError on %s', request.url)
-            print('TimeoutError on %s', request.url)
 
     @staticmethod
     def close(spider, reason):
