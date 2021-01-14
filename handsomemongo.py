@@ -56,7 +56,7 @@ class HandsomeMongo(object):
             self.checksum_coll.insert_one(doc4checksum)
         except DuplicateKeyError:
             # 重了
-            dup_doc = self.checksum_coll.find_one({"_id":doc4checksum["_id"]})
+            dup_doc = self.checksum_coll.find_one({"_id": doc4checksum["_id"]})
             print("The paper {} is duplicate with another paper {}".format(doc, dup_doc))
             return self.DUPLICATEKEY
         else:
