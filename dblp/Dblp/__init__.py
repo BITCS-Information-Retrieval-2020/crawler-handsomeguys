@@ -1,1 +1,0 @@
-from .settings import DB_NAME, LOCAL_MONGO_HOST, LOCAL_MONGO_PORT
