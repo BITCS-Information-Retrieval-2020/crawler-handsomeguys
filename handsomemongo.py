@@ -24,7 +24,10 @@ class HandsomeMongo(object):
 
     def construct_checksumdoc(self, doc) -> dict:
         doc_title = doc["title"]
-        doc_title = ' '.join(doc_title.strip().translate(None, string.punctuation).split())
+        doc_title = doc_title.strip()
+        table = str.maketrans('', '', string.punctuation)
+        doc_title = ' '.join(doc_title.translate(table).split())
+        doc_title = doc_title.lower()
         doc_authors = doc["authors"].split(", ")
         doc_authors_capital = []
         for author in doc_authors:
@@ -37,7 +40,7 @@ class HandsomeMongo(object):
             else:
                 raise NotImplementedError
 
-            doc_authors_capital.append(author_cap)
+            doc_authors_capital.append(author_cap.lower())
         doc_authors_capital.insert(0, doc_title)
         doc_checksum = zlib.adler32((" ".join(doc_authors_capital)).encode(encoding="utf-8"))
         doc4checksum = {"_id": doc_checksum, "title": doc_title, "authors": doc["authors"]}
@@ -53,6 +56,8 @@ class HandsomeMongo(object):
             self.checksum_coll.insert_one(doc4checksum)
         except DuplicateKeyError:
             # 重了
+            dup_doc = self.checksum_coll.find_one({"_id":doc4checksum["_id"]})
+            print("The paper {} is duplicate with another paper {}".format(doc, dup_doc))
             return self.DUPLICATEKEY
         else:
             self.target_coll.insert_one(doc)
