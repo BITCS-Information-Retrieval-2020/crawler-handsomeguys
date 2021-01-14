@@ -137,9 +137,34 @@ results = title2content.search(title)
 - 杨毅哲：paperswithcode的api实验，爬虫模块的设计与实现
 - 刘啸尘：主动检索接口的设计与实现
 
+
 ### DBLP
 
-待填写
+Dblp 爬虫基于 scrapy 框架进行开发，能够高效率的根据关键词检索爬取 Dblp 网站可检索到的学术论文信息，从网页提供的json格式api挖掘出
+论文标题、作者、论文 PDF 文件地址等信息，并具有下载 PDF 文件的功能。
+
+#### 工作流程
+
+爬虫的工作模式如下：
+
+1. 使用`https://dblp.uni-trier.de/search/publ/api?q=` 拼接 keyword 和检索参数构造url。
+2. 访问第一步构造的url得到检索的返回结果，解析json格式的结果，抽取出其中每一篇文献的具体信息：标题、作者、年分、pdf来源连接、发表机构等。
+3. 借助pdf来源连接访问原网页爬取对应pdf，并储存在根目录下。
+4. 保存爬取到的item，储存到mongoDB中。
+5. 从爬取到的文献中提取关键字词作为下一次检索的关键字词，重新构造url进行递归爬取。
+
+Dblp 爬虫的运行受 `main.py` 控制，也可使用如下代码单独运行 Dblp 爬虫：
+
+```bash
+cd Dblp
+scrapy crawl Dblp
+```
+
+#### 小组分工
+
+- 张晓：搭建了dblp爬虫整体框架，实现了对pdf的抓取下载和mongoDB数据库存储；
+- 刘梦歌：完成了对json文件的item解析和关键词递归爬取实现；
+
 
 ### 增量更新实现细节
 
