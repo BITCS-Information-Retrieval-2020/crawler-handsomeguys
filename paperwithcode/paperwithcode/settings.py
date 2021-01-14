@@ -1,58 +1,34 @@
-# -*- coding: utf-8 -*-
-import os
-# Scrapy settings for Crossminds project
-#
+# Scrapy settings for paperwithcode project
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
-#
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-LOCAL_MONGO_HOST = '47.103.222.126'
-LOCAL_MONGO_PORT = 27017
-USER_NAME = 'handsomeguys'
-PASSWORD = '12138'
-DB_NAME = 'crawler'
 
-BOT_NAME = 'Crossminds'
+BOT_NAME = 'paperwithcode'
 
-SPIDER_MODULES = ['Crossminds.spiders']
-NEWSPIDER_MODULE = 'Crossminds.spiders'
+SPIDER_MODULES = ['paperwithcode.spiders']
+NEWSPIDER_MODULE = 'paperwithcode.spiders'
 
-FILES_STORE = os.path.join('..', 'data', 'PDFs')
-FILES_URLS_FIELD = 'file_urls'  # 这里对应着item.py文件中的字段
-FILES_RESULT_FIELD = 'files'  # 同样对应item.py文件中的字段
-# 120 days of delay for files expiration
-FILES_EXPIRES = 120
+MEDIA_ALLOW_REDIRECTS = True
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'Crossminds (+http://www.yourdomain.com)'
+# USER_AGENT = 'paperwithcode (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
-# See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
+# See https://docs.scrapy.org/en/latest/topics/settings.html# download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
-DOWNLOAD_TIMEOUT = 5000
+# DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 15
-CONCURRENT_REQUESTS_PER_IP = 15
-CONCURRENT_REQUESTS = 15
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
-DEFAULT_REQUEST_HEADERS = {
-    'accept': 'application/json, text/plain, */*',
-    'content-type': 'application/json',
-    'Connection': 'keep-alive',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'referer': 'https://crossminds.ai/',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'
-}
+
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
 
@@ -67,27 +43,26 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-    'Crossminds.middlewares.CrossmindsSpiderMiddleware': 543,
-}
+# SPIDER_MIDDLEWARES = {
+#    'paperwithcode.middlewares.PaperwithcodeSpiderMiddleware': 543,
+# }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-    'Crossminds.middlewares.CrossmindsDownloaderMiddleware': 543,
-}
+# DOWNLOADER_MIDDLEWARES = {
+#    'paperwithcode.middlewares.PaperwithcodeDownloaderMiddleware': 543,
+# }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-EXTENSIONS = {
-    'scrapy.extensions.telnet.TelnetConsole': None,
-}
+# EXTENSIONS = {
+#    'scrapy.extensions.telnet.TelnetConsole': None,
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'Crossminds.pipelines.CrossmindsPipeline': 300,
-    'Crossminds.pipelines.PDFPipeline': 1,
+    'paperwithcode.pipelines.PaperwithcodePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -104,9 +79,13 @@ ITEM_PIPELINES = {
 # AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
+# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html# httpcache-middleware-settings
 # HTTPCACHE_ENABLED = True
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+FILE_STORED_PATH = './pdfs/'
+
+RETRY_ENABLED = False

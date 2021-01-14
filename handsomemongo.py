@@ -7,10 +7,10 @@ from pymongo.errors import DuplicateKeyError
 
 class HandsomeMongo(object):
     def __init__(self, db, target_collection) -> None:
-        '''
+        """
         理应只创建一个对象，涉及到多线程并发时候调用同一个对象的方法。类似pipelines中的elf.PaperSpiderItem
         封装地比较简单，有接口需要加参数的我再加
-        '''
+        """
         super().__init__()
         self.checksum_coll = db["checksum"]
         self.target_coll = db[target_collection]

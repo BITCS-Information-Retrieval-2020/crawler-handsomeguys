@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
+import re
 import os
 
 import scrapy
-from Crossminds.items import CrossmindsItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Request
 from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
+
+from Crossminds.items import CrossmindsItem, PDFItem
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
 
 
 def get_conferences(data):
@@ -39,6 +41,25 @@ def parse_paper(data):
         yield _id, author, title, description, video_source, video_url
 
 
+def format_title(title):
+    title = re.sub(r'Session\s*\w+\s*-\s*', '', title)
+    title = re.sub(r'SIGIR\s*\w*\s*-\s*', '', title)
+    title = re.sub(r'\[[\x00-\x7F]+]\s*', '', title)  # 去掉中括号
+    title = re.sub(r'(\([\x00-\x7F]*\))', '', title)  # 去掉小括号
+    title = title.strip()
+    return title
+
+
+def format_file_name(file_name):
+    # file_name = re.sub(r'[\s\-]+', '_', file_name)  # 空格和连接符转化为_
+    # file_name = re.sub(r'_*\W', '', file_name)  # 去掉所有奇怪的字符
+    file_name = re.sub(r'[^A-Za-z0-9_]', ' ', file_name)
+    file_name = file_name.strip()
+    file_name = re.sub(r'\s+', '_', file_name)
+
+    return file_name
+
+
 class CrossmindsSpider(scrapy.Spider):
     name = 'Crossminds'
     start_url = 'https://api.crossminds.io/content/category/parents/details'
@@ -58,10 +79,37 @@ class CrossmindsSpider(scrapy.Spider):
                           callback=lambda res, con=conference: self.parse_detail(res, con))
 
     def parse_detail(self, response, conference):
-        info = CrossmindsItem()
-        org, year = conference.split(' ')
+        org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
         for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
+            info = CrossmindsItem()
+            pdfs = PDFItem()
+
+            title = format_title(title)
+            file_name = format_file_name(title)
+            pdfs['file_names'] = file_name
+
+            urls = re.findall(r'https?://[^\s)]*', description)
+            for url in urls:
+                if 'arxiv.org/abs' in url:
+                    url = url.replace('abs', 'pdf') + '.pdf'
+                    url = re.sub(r'[^\x21-\x7e]', '', url)
+                    url = re.sub(r'\.{2,}', '.', url)
+                    pdfs['file_urls'] = url
+                    info['pdfUrl'] = url
+                    info['publicationUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
+                elif '.pdf' in url:
+                    pdfs['file_urls'] = url
+                    info['pdfUrl'] = url
+                    info['publicationUrl'] = url
+                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
+                elif 'github.com' in url:
+                    info['codeUrl'] = url
+
+            if pdfs['file_urls']:
+                yield pdfs
+
             info['id'] = _id
             info['title'] = title
             info['authors'] = author['name']
