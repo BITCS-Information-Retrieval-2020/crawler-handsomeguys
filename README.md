@@ -52,6 +52,48 @@
 4. 为了避免潜在的冲突问题，在修改代码前，请先使用`git fetch origin`和`git merge`从远程仓库中拉取可能存在的更新 (推荐使用 vscode 或 pycharm 的图形界面)
 5. 完成自己的模块之后，请自行使用 flake8 检测自己的代码风格是否符合规范
 
+## 项目结构
+
+```
+crawler-handsomeguys
+├─ .gitignore
+├─ Crossminds
+│    ├─ Crossminds
+│    │    ├─ __init__.py
+│    │    ├─ __pycache__
+│    │    ├─ items.py
+│    │    ├─ middlewares.py
+│    │    ├─ pipelines.py
+│    │    ├─ settings.py
+│    │    └─ spiders
+│    └─ scrapy.cfg
+├─ Dblp
+│    ├─ Dblp
+│    │    ├─ __init__.py
+│    │    ├─ items.py
+│    │    ├─ middlewares.py
+│    │    ├─ pipelines.py
+│    │    ├─ settings.py
+│    │    └─ spiders
+│    └─ scrapy.cfg
+├─ README.md
+├─ crossminds.py
+├─ handsomemongo.py
+├─ main.py
+├─ paperwithcode
+│    ├─ config.json
+│    └─ paperwithcode
+│           ├─ __init__.py
+│           ├─ items.py
+│           ├─ middlewares.py
+│           ├─ paperfromquery.py
+│           ├─ pipelines.py
+│           ├─ settings.py
+│           ├─ spiders
+│           └─ titlesearch.py
+└─ utils.py
+```
+
 ## 安装
 
 ### 环境要求
@@ -62,6 +104,8 @@
 - [FFmpeg](https://github.com/FFmpeg/FFmpeg) 4.3.1 或更新版本
 - [you-get](https://github.com/soimort/you-get) 0.4.1500 或更新版本
 - [scrapy](https://github.com/scrapy/scrapy) 2.4.1 或更新版本
+- [requests](https://github.com/psf/requests) 2.23 或更新版本
+- [PyMongo](https://github.com/mongodb/mongo-python-driver) 3.11.2 或更新版本
 
 ### FFmpeg 安装
 
@@ -95,7 +139,35 @@ pip install scrapy
 conda install scrapy -c conda-forge -y
 ```
 
-### 模块安装
+### requests 安装
+
+Requests 是一个简单而优雅的 HTTP 库，它可以通过 pip 进行安装：
+
+```bash
+python -m pip install requests
+```
+
+也可以通过 conda 进行安装：
+
+```bash
+conda install requests -c conda-forge -y
+```
+
+### PyMongo
+
+PyMongo 允许用户使用 Python 与 MongoDB 数据库进行交互。它可以通过 pip 安装：
+
+```bash
+python -m pip install pymongo
+```
+
+也可以通过 conda 进行安装：
+
+```bash
+conda install -c conda-forge pymongo
+```
+
+### handsome-guys 爬虫模块安装
 
 首先从将该仓库克隆到本地：
 
