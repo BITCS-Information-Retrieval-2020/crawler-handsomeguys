@@ -44,8 +44,8 @@ def parse_paper(data):
 def format_title(title):
     title = re.sub(r'Session\s*\w+\s*-\s*', '', title)
     title = re.sub(r'SIGIR\s*\w*\s*-\s*', '', title)
-    title = re.sub(r'\[[\x00-\x7F]+]\s*', '', title)  # 去掉中括号
-    title = re.sub(r'(\([\x00-\x7F]*\))', '', title)  # 去掉小括号
+    title = re.sub(r'\[[\x00-\x7F]+]\s*?', '', title)  # 去掉中括号
+    title = re.sub(r'(\([\x00-\x7F]*?\))', '', title)  # 去掉小括号
     title = title.strip()
     return title
 
