@@ -49,7 +49,7 @@ def merge(source: Collection,
 
         new_data['authors'] = format_authors(new_data['authors'])
         new_data['pdfPath'] = format_path(new_data['pdfPath'])
-        new_data['video_path'] = format_path(new_data['video_path'])
+        new_data['video_path'] = format_path(new_data['videoPath'])
 
         status, dup_doc = handsomemongo.insert_one(new_data)
         if status == 1:
