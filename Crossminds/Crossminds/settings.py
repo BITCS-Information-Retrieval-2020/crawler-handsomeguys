@@ -51,7 +51,7 @@ DEFAULT_REQUEST_HEADERS = {
     'Connection': 'keep-alive',
     'Accept-Encoding': 'gzip, deflate, br',
     'referer': 'https://crossminds.ai/',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko)'
 }
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
