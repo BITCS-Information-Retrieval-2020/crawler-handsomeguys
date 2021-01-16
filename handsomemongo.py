@@ -34,20 +34,27 @@ class HandsomeMongo(object):
         table = str.maketrans('', '', string.punctuation)
         doc_title = ' '.join(doc_title.translate(table).split())
         doc_title = doc_title.lower()
+        # 若所有作者为空("")，则doc_authors为['']
         doc_authors = doc["authors"].split(", ")
         doc_authors_capital = []
-        for author in doc_authors:
-            part_name = author.split()
+        # for author in doc_authors:
+        for i in range(len(doc_authors)):
+            # 若这个作者是空的，则part_name = []
+            part_name = doc_authors[i].split()
             author_cap = None
             if (part_name_len := len(part_name)) > 1:
                 author_cap = part_name[0][0] + part_name[-1][0]
             elif part_name_len == 1:
                 author_cap = part_name[0][0]
             else:
-                raise NotImplementedError
+                # raise NotImplementedError
+                # 例如作者为"a, , b"则最后结果是"title a b"
+                print("In paper {} author {} is empty.".format(doc["title"], i))
+                continue
 
             doc_authors_capital.append(author_cap.lower())
         doc_authors_capital.insert(0, doc_title)
+        print(' '.join(doc_authors_capital))
         doc_checksum = zlib.adler32(
             (" ".join(doc_authors_capital)).encode(encoding="utf-8"))
         doc4checksum = {
