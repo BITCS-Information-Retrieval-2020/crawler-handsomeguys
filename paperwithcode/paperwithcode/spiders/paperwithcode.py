@@ -1,14 +1,15 @@
-import scrapy
-from paperwithcode.items import PaperwithcodeItem
-from scrapy.http import Request
-import pymongo
 import json
-from paperwithcode.settings import FILE_STORED_PATH
 import os
-from scrapy.spidermiddlewares.httperror import HttpError
-from twisted.internet.error import DNSLookupError
-from twisted.internet.error import TimeoutError
+
+import pymongo
 import requests
+import scrapy
+from scrapy.http import Request
+from scrapy.spidermiddlewares.httperror import HttpError
+from twisted.internet.error import DNSLookupError, TimeoutError
+
+from paperwithcode.items import PaperwithcodeItem
+from paperwithcode.settings import FILE_STORED_PATH
 
 
 class PaperWithCodeSpider(scrapy.Spider):

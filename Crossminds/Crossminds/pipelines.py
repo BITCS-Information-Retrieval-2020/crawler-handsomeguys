@@ -6,10 +6,8 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 import pymongo
-from pymongo.errors import DuplicateKeyError
-from scrapy.pipelines.files import FilesPipeline
 from scrapy.http.request import Request
-import re
+from scrapy.pipelines.files import FilesPipeline
 
 from Crossminds.items import CrossmindsItem, PDFItem
 from Crossminds.settings import DEFAULT_REQUEST_HEADERS
@@ -52,7 +50,9 @@ class CrossmindsPipeline(object):
 class PDFPipeline(FilesPipeline):
     def get_media_requests(self, item, info):
         if isinstance(item, PDFItem):
-            yield Request(url=item['file_urls'], headers=DEFAULT_REQUEST_HEADERS, meta={'file_names': item['file_names']})
+            yield Request(url=item['file_urls'],
+                          headers=DEFAULT_REQUEST_HEADERS,
+                          meta={'file_names': item['file_names']})
 
     def file_path(self, request, response=None, info=None, *, item=None):
         file_name = request.meta['file_names']

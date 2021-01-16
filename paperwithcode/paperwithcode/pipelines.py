@@ -3,12 +3,14 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
+import os
+
+import pymongo
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-import pymongo
+
 from paperwithcode.items import PaperwithcodeItem
 from paperwithcode.settings import FILE_STORED_PATH
-import os
 
 
 class PaperwithcodePipeline(object):

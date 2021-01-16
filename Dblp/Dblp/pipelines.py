@@ -2,24 +2,13 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-
 # useful for handling different item types with a single interface
-import json
-import random
-
-from scrapy.http.request import Request
-
 import pymongo
-from itemadapter import ItemAdapter
-from scrapy.exceptions import DropItem
-import unicodedata
-import string
-import scrapy
+from scrapy.http.request import Request
 from scrapy.pipelines.files import FilesPipeline
 from scrapy.settings.default_settings import DEFAULT_REQUEST_HEADERS
 
-from .items import DblpItem, PDFItem
+from .items import DblpItem
 
 
 class CrossmindsPipeline:
@@ -29,10 +18,8 @@ class CrossmindsPipeline:
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(
-            mongo_uri='mongodb://47.103.222.126:27017',
-            mongo_db='crawler'
-        )
+        return cls(mongo_uri='mongodb://47.103.222.126:27017',
+                   mongo_db='crawler')
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.mongo_uri)
@@ -78,7 +65,9 @@ class PDFPipeline(FilesPipeline):
 
     def get_media_requests(self, item, info):
         if isinstance(item, DblpItem):
-            yield Request(url=item['pdfUrl'], headers=DEFAULT_REQUEST_HEADERS, meta={'title': item['title']})
+            yield Request(url=item['pdfUrl'],
+                          headers=DEFAULT_REQUEST_HEADERS,
+                          meta={'title': item['title']})
 
     def file_path(self, request, response=None, info=None, *, item=None):
         file_name = request.meta['title']

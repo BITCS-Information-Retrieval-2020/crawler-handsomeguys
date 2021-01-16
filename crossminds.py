@@ -1,15 +1,17 @@
 import json
+import random
+import time
 
 import requests
-import time
-import random
+
 from utils import download_video
 
 BASE_URL = 'https://crossminds.ai'
 
 
 def get_conferences():
-    r = requests.get('https://api.crossminds.io/content/category/parents/details')
+    r = requests.get(
+        'https://api.crossminds.io/content/category/parents/details')
     my_json = json.loads(r.content.decode())
     # with open('test.json', 'r') as f:
     #     my_json = json.load(f)
@@ -31,14 +33,17 @@ def get_conference_papers(conference, limit, offset):
         },
     }
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60',
+        'user-agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
         'Connection': 'keep-alive',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept': '*/*',
         'Content-Type': 'application/json'
     }
 
-    r = requests.post('https://api.crossminds.io/web/content/bycategory', data=json.dumps(data), headers=headers)
+    r = requests.post('https://api.crossminds.io/web/content/bycategory',
+                      data=json.dumps(data),
+                      headers=headers)
     infos = json.loads(r.content.decode())
     # with open('test2.json', 'w') as f:
     #     f.write(r.content.decode())
@@ -66,7 +71,8 @@ if __name__ == '__main__':
     for conference in conferences:
         limit, offset = 2000, 0
         papers = get_conference_papers(conference, limit=limit, offset=offset)
-        for _id, author, title, description, video_source, video_url in parser(papers['results']):
+        for _id, author, title, description, video_source, video_url in parser(
+                papers['results']):
             print(_id, author, description, video_url)
             # download_video(video_source, video_url, title)
         time.sleep(random.uniform(1, 5))

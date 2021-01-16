@@ -1,13 +1,18 @@
 import os
 import re
-from pymongo import MongoClient
-from utils import download_video
 from multiprocessing import Pool
-from handsomemongo import HandsomeMongo
+
+from pymongo import MongoClient
 from pymongo.collection import Collection
 
+from handsomemongo import HandsomeMongo
+from utils import download_video
+
 VIDEO_PATH = os.path.join('.', 'data', 'videos')
-KEYS = ['_id', 'title', 'authors', 'abstract', 'publicationOrg', 'year', 'pdfUrl', 'pdfPath', 'publicationUrl', 'codeUrl', 'videoUrl', 'videoPath']
+KEYS = [
+    '_id', 'title', 'authors', 'abstract', 'publicationOrg', 'year', 'pdfUrl',
+    'pdfPath', 'publicationUrl', 'codeUrl', 'videoUrl', 'videoPath'
+]
 
 
 def format_path(path):
@@ -25,7 +30,10 @@ def format_authors(authors):
     return authors
 
 
-def merge(source: Collection, target: Collection, update_pdf=False, update_code=False):
+def merge(source: Collection,
+          target: Collection,
+          update_pdf=False,
+          update_code=False):
     queries = source.find()
     for query in queries:
         new_data = {}
@@ -48,11 +56,17 @@ def merge(source: Collection, target: Collection, update_pdf=False, update_code=
             if update_pdf:
                 pdf_url = new_data['pdfUrl']
                 if pdf_url != '':
-                    handsomemongo.update_one({'_id': dup_doc['_id']}, {'$set': {'pdfUrl': pdf_url}})
+                    handsomemongo.update_one({'_id': dup_doc['_id']},
+                                             {'$set': {
+                                                 'pdfUrl': pdf_url
+                                             }})
             if update_code:
                 code_url = new_data['codeUrl']
                 if code_url != '':
-                    handsomemongo.update_one({'_id': dup_doc['_id']}, {'$set': {'codeUrl': code_url}})
+                    handsomemongo.update_one({'_id': dup_doc['_id']},
+                                             {'$set': {
+                                                 'codeUrl': code_url
+                                             }})
 
 
 if __name__ == '__main__':
@@ -69,7 +83,8 @@ if __name__ == '__main__':
     os.system(command)
 
     # 连接到数据库
-    client = MongoClient('mongodb://handsomeguys:12138@47.103.222.126:27017/crawler')
+    client = MongoClient(
+        'mongodb://handsomeguys:12138@47.103.222.126:27017/crawler')
     my_db = client['crawler']
     my_col = my_db['papers']
 
@@ -77,7 +92,10 @@ if __name__ == '__main__':
     # 转移 crossminds 数据
     merge(source=my_db['test'], target=my_db['papers'])
     # 转移 papers with code 数据
-    merge(source=my_db['paperswithcode'], target=my_db['papers'], update_pdf=True, update_code=True)
+    merge(source=my_db['paperswithcode'],
+          target=my_db['papers'],
+          update_pdf=True,
+          update_code=True)
     # 转移 dblp 数据
     merge(source=my_db['dblp'], target=my_db['papers'])
 
@@ -86,7 +104,8 @@ if __name__ == '__main__':
     # 创建进程池
     pool = Pool(processes=4)
     for query in queries:
-        _id, title, videoUrl, source = query['_id'], query['title'], query['videoUrl'], query['source']
+        _id, title, videoUrl, source = query['_id'], query['title'], query[
+            'videoUrl'], query['source']
         # 去除文件名中的非法字符
         video_name = re.sub(r'[^A-Za-z0-9_]', ' ', title)
         video_name = video_name.strip()
@@ -95,7 +114,8 @@ if __name__ == '__main__':
         # 若该视频不存在则调用 download_video() 函数下载
         if not os.path.exists(save_path):
             my_col.update_one({"_id": _id}, {"$set": {"videoPath": save_path}})
-            pool.apply_async(download_video, args=[source, videoUrl, video_name, VIDEO_PATH])
+            pool.apply_async(download_video,
+                             args=[source, videoUrl, video_name, VIDEO_PATH])
 
     pool.close()
     pool.join()

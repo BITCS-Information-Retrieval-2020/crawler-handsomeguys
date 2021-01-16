@@ -1,10 +1,8 @@
 import json
 
 import scrapy
-import requests
-from scrapy.crawler import CrawlerProcess
 
-from ..items import DblpItem, PDFItem
+from ..items import DblpItem
 
 # from ..pipelines import DblpPipeline
 # import pymysql
@@ -52,8 +50,7 @@ class DblpSpider(scrapy.Spider):
         url += '&h=' + str(PAPER_PERPAGE) + '&format=json'
 
         # 创建 scrapy.Request 实例
-        req = scrapy.Request(url=url,
-                             callback=self.parse)
+        req = scrapy.Request(url=url, callback=self.parse)
         yield req
 
     # def parse(self, response):
@@ -81,7 +78,10 @@ class DblpSpider(scrapy.Spider):
         except KeyError:
             tips = []
         # print("===tips:", type(tips))
-        listPrint = ["authors", "title", "venue", "year", "type", "key", "doi", "ee", "url"]
+        listPrint = [
+            "authors", "title", "venue", "year", "type", "key", "doi", "ee",
+            "url"
+        ]
         not_crawl = ["type", "key", "doi", "url"]
 
         item = DblpItem()
@@ -150,8 +150,7 @@ class DblpSpider(scrapy.Spider):
             url += '&h=' + str(PAPER_PERPAGE) + '&format=json'
 
             # 创建 scrapy.Request 实例
-            req = scrapy.Request(url=url,
-                                 callback=self.parse)
+            req = scrapy.Request(url=url, callback=self.parse)
             yield req
 
     def pdfPaser(self, response):
@@ -167,6 +166,7 @@ class DblpSpider(scrapy.Spider):
                 #     except RuntimeError:
                 #         continue
                 #     print(href)
+
 
 #
 # process = CrawlerProcess(settings={

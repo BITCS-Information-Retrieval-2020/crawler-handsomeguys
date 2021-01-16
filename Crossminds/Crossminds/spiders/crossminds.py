@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
-import re
 import os
+import re
 
 import scrapy
+from Crossminds.items import CrossmindsItem, PDFItem
+from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
+from format import format_title
 from scrapy.crawler import CrawlerProcess
 from scrapy.http import Request
 from scrapy.utils.project import get_project_settings
 from tqdm import tqdm
-
-from Crossminds.items import CrossmindsItem, PDFItem
-from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
-from format import format_title
 
 
 def get_conferences(data):
@@ -67,7 +66,9 @@ class CrossmindsSpider(scrapy.Spider):
     second_url = 'https://api.crossminds.io/web/content/bycategory'
 
     def start_requests(self):
-        yield Request(url=self.start_url, headers=DEFAULT_REQUEST_HEADERS, callback=self.parse)
+        yield Request(url=self.start_url,
+                      headers=DEFAULT_REQUEST_HEADERS,
+                      callback=self.parse)
 
     def parse(self, response, **kwargs):
         # 获取会议列表
@@ -75,14 +76,25 @@ class CrossmindsSpider(scrapy.Spider):
         # 获取每一个会议
         for conference in tqdm(conferences):
             # time.sleep(random.uniform(1, 5))
-            body = json.dumps({'limit': 5000, 'offset': 0, 'search': {'category': conference}})
-            yield Request(url=self.second_url, method='post', headers=DEFAULT_REQUEST_HEADERS, body=body,
-                          callback=lambda res, con=conference: self.parse_detail(res, con))
+            body = json.dumps({
+                'limit': 5000,
+                'offset': 0,
+                'search': {
+                    'category': conference
+                }
+            })
+            yield Request(url=self.second_url,
+                          method='post',
+                          headers=DEFAULT_REQUEST_HEADERS,
+                          body=body,
+                          callback=lambda res, con=conference: self.
+                          parse_detail(res, con))
 
     def parse_detail(self, response, conference):
         org, year = conference.rsplit(' ', maxsplit=1)
         papers = json.loads(response.text)
-        for _id, author, title, description, video_source, video_url in parse_paper(papers['results']):
+        for _id, author, title, description, video_source, video_url in parse_paper(
+                papers['results']):
             info = CrossmindsItem()
             pdfs = PDFItem()
 
@@ -99,12 +111,14 @@ class CrossmindsSpider(scrapy.Spider):
                     pdfs['file_urls'] = url
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
+                    info['pdfPath'] = os.path.join(FILES_STORE,
+                                                   f'{file_name}.pdf')
                 elif '.pdf' in url:
                     pdfs['file_urls'] = url
                     info['pdfUrl'] = url
                     info['publicationUrl'] = url
-                    info['pdfPath'] = os.path.join(FILES_STORE, f'{file_name}.pdf')
+                    info['pdfPath'] = os.path.join(FILES_STORE,
+                                                   f'{file_name}.pdf')
                 elif 'github.com' in url:
                     info['codeUrl'] = url
 

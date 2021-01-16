@@ -1,9 +1,9 @@
-import zlib
 import string
+import zlib
 
 import pymongo
-from pymongo.errors import DuplicateKeyError
 from pymongo.database import Database
+from pymongo.errors import DuplicateKeyError
 
 
 class HandsomeMongo(object):
@@ -48,11 +48,17 @@ class HandsomeMongo(object):
 
             doc_authors_capital.append(author_cap.lower())
         doc_authors_capital.insert(0, doc_title)
-        doc_checksum = zlib.adler32((" ".join(doc_authors_capital)).encode(encoding="utf-8"))
-        doc4checksum = {"_id": doc_checksum, "title": doc["title"], "authors": doc["authors"], "origin_id": doc["_id"]}
+        doc_checksum = zlib.adler32(
+            (" ".join(doc_authors_capital)).encode(encoding="utf-8"))
+        doc4checksum = {
+            "_id": doc_checksum,
+            "title": doc["title"],
+            "authors": doc["authors"],
+            "origin_id": doc["_id"]
+        }
         return doc4checksum
 
-    def insert_one(self, doc) -> (int, dict):
+    def insert_one(self, doc):
         '''
         确保作者以“, ”分隔（英文的逗号和空格）
         返回0（self.SUCESSFUL)表示成功，返回1（self.DUPLICATEKEY）表示是重复的
@@ -63,8 +69,9 @@ class HandsomeMongo(object):
         except DuplicateKeyError:
             # 重了
             dup_doc = self.checksum_coll.find_one({"_id": doc4checksum["_id"]})
-            print("The paper {{'title': {}, 'authors': {}, '_id': {}}} is duplicate with another paper {}"
-                  .format(doc["title"], doc["authors"], doc["_id"], dup_doc))
+            print(
+                "The paper {{'title': {}, 'authors': {}, '_id': {}}} is duplicate with another paper {}"
+                .format(doc["title"], doc["authors"], doc["_id"], dup_doc))
             return (self.DUPLICATEKEY, dup_doc)
         else:
             self.target_coll.insert_one(doc)
