@@ -43,16 +43,16 @@ def merge(source: Collection, target: Collection, update_pdf=False, update_code=
         new_data['pdfPath'] = format_path(new_data['pdfPath'])
         new_data['video_path'] = format_path(new_data['video_path'])
 
-        status, _id = handsomemongo.insert_one(new_data)
+        status, dup_doc = handsomemongo.insert_one(new_data)
         if status == 1:
             if update_pdf:
                 pdf_url = new_data['pdfUrl']
                 if pdf_url != '':
-                    handsomemongo.update_one({'_id': _id}, {'$set': {'pdfUrl': pdf_url}})
+                    handsomemongo.update_one({'_id': dup_doc['_id']}, {'$set': {'pdfUrl': pdf_url}})
             if update_code:
                 code_url = new_data['codeUrl']
                 if code_url != '':
-                    handsomemongo.update_one({'_id': id}, {'$set': {'codeUrl': code_url}})
+                    handsomemongo.update_one({'_id': dup_doc['_id']}, {'$set': {'codeUrl': code_url}})
 
 
 if __name__ == '__main__':
