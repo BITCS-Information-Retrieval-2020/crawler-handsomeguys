@@ -30,7 +30,7 @@ class HandsomeMongo(object):
 
     def construct_checksumdoc(self, doc) -> dict:
         doc_title = doc["title"]
-        doc_title = doc_title.strip()
+        doc_title = doc_title.strip() if doc_title or (doc_title != "") else "hello world"
         table = str.maketrans('', '', string.punctuation)
         doc_title = ' '.join(doc_title.translate(table).split())
         doc_title = doc_title.lower()
