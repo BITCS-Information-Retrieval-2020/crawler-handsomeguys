@@ -39,38 +39,22 @@ class PaperWithCodeSpider(scrapy.Spider):
                 f"https://paperswithcode.com/api/v1/papers/{id}/repositories")
             code_urls = json.loads(code_url_response.text)
             codeUrl = code_urls[0]["url"] if len(code_urls) > 0 else ""
-            data = {
-                "title":
-                paper["title"],
-                "authors":
-                ", ".join(paper["authors"]),
-                "abstract":
-                paper["abstract"],
-                "publicationOrg":
-                paper["proceeding"] if paper["proceeding"] is not None else "",
-                "year":
-                paper["published"].split('-')[0]
-                if paper["published"] is not None else "",
-                "pdfUrl":
-                paper["url_pdf"],
-                "publicationUrl":
-                paper["conference_url_pdf"]
-                if paper["conference_url_pdf"] is not None else "",
-                "codeUrl":
-                codeUrl
-            }
+            item = PaperwithcodeItem()
+            item['title'] = paper["title"]
+            item['authors'] = ", ".join(paper["authors"])
+            item['abstract'] = paper["abstract"]
+            item['publicationOrg'] = paper["proceeding"] if paper[
+                "proceeding"] is not None else "",
+            item['year'] = paper["published"].split(
+                '-')[0] if paper["published"] is not None else ""
+            item['pdfUrl'] = paper["url_pdf"]
+            item['publicationUrl'] = paper["conference_url_pdf"] if paper[
+                "conference_url_pdf"] is not None else "",
             if codeUrl != "":
-                self.pdf_url.append(paper["url_pdf"])
-            query = list(
-                self.collection.find({}, {
-                    "_id": 1
-                }).sort('_id', -1).limit(1))
-            data['_id'] = 1 if len(query) == 0 else query[0]['_id'] + 1
-            self.collection.insert_one(data)
-            if codeUrl != "":
-                item = PaperwithcodeItem()
-                item['title'] = response.meta['title']
                 item['pdfContent'] = response.body
+                yield item
+            else:
+                item['pdfContent'] = None
                 yield item
         page = int(next_url.split("=")[-1])
         if page > self.config["page"]:
