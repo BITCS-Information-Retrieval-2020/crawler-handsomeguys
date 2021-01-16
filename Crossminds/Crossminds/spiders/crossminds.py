@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from Crossminds.items import CrossmindsItem, PDFItem
 from Crossminds.settings import DEFAULT_REQUEST_HEADERS, FILES_STORE
+from format import format_title
 
 
 def get_conferences(data):
@@ -41,13 +42,13 @@ def parse_paper(data):
         yield _id, author, title, description, video_source, video_url
 
 
-def format_title(title):
-    title = re.sub(r'Session\s*\w+\s*-\s*', '', title)
-    title = re.sub(r'SIGIR\s*\w*\s*-\s*', '', title)
-    title = re.sub(r'\[[\x00-\x7F]+]\s*?', '', title)  # 去掉中括号
-    title = re.sub(r'(\([\x00-\x7F]*?\))', '', title)  # 去掉小括号
-    title = title.strip()
-    return title
+# def format_title(title):
+#     title = re.sub(r'Session\s*\w+\s*-\s*', '', title)
+#     title = re.sub(r'SIGIR\s*\w*\s*-\s*', '', title)
+#     title = re.sub(r'\[[\x00-\x7F]+]\s*?', '', title)  # 去掉中括号
+#     title = re.sub(r'(\([\x00-\x7F]*?\))', '', title)  # 去掉小括号
+#     title = title.strip()
+#     return title
 
 
 def format_file_name(file_name):
