@@ -100,7 +100,7 @@ crawler-handsomeguys
 
 以下依赖是该模块运行所必须的：
 
-- [Python](https://www.python.org/downloads/) 3.7 或更新版本
+- [Python](https://www.python.org/downloads/) 3.8 或更新版本
 - [FFmpeg](https://github.com/FFmpeg/FFmpeg) 4.3.1 或更新版本
 - [you-get](https://github.com/soimort/you-get) 0.4.1500 或更新版本
 - [scrapy](https://github.com/scrapy/scrapy) 2.4.1 或更新版本
@@ -297,7 +297,7 @@ scrapy crawl Dblp
 
 #### 小组分工
 
-- 张晓：搭建了 dblp 爬虫整体框架，实现了对 pdf 的抓取下载和 mongoDB 数据库存储；
+- 张骁：搭建了 dblp 爬虫整体框架，实现了对 pdf 的抓取下载和 mongoDB 数据库存储；
 - 刘梦歌：完成了对 json 文件的 item 解析和关键词递归爬取实现；
 
 ### 增量更新实现细节
