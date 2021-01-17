@@ -1,7 +1,6 @@
 import json
 import os
 
-import pymongo
 import requests
 import scrapy
 from scrapy.http import Request
@@ -20,10 +19,6 @@ class PaperWithCodeSpider(scrapy.Spider):
         with open('./config.json') as f:
             config = json.load(f)
         self.config = config
-        self.client = pymongo.MongoClient('mongodb://47.103.222.126:27017')
-        db = self.client['crawler']
-        db.authenticate('handsomeguys', '12138')
-        self.collection = db['paperswithcode']
 
     def start_requests(self):
         page = int(self.config['page'])
