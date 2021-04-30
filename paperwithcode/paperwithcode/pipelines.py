@@ -17,7 +17,6 @@ class PaperwithcodePipeline(object):
     def open_spider(self, spider):
         self.client = pymongo.MongoClient('mongodb://47.103.222.126:27017')
         db = self.client['crawler']
-        db.authenticate('handsomeguys', '12138')
         self.collection = db['paperswithcode']
 
     def close_spider(self, spider):
