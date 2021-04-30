@@ -24,7 +24,6 @@ class CrossmindsPipeline:
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
-        self.db.authenticate('handsomeguys', '12138')
         self.collection = 'Dblp'
 
     def process_item(self, item, spider):
