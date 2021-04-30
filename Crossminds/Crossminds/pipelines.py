@@ -19,7 +19,6 @@ class CrossmindsPipeline(object):
         client = pymongo.MongoClient('mongodb://47.103.222.126:27017')
         # 'mongo --host 47.103.222.126 -u handsomeguys -p 12138 --authenticationDatabase crawler'
         db = client.crawler
-        db.authenticate('handsomeguys', '12138')
         # db = client[DB_NAME]
         self.PaperSpiderItem = db['test']
 
